@@ -146,9 +146,7 @@ export default function HistoryPage() {
     const generateBoldTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
         const centerX = canvas.width / 2;
         
-        // Clean black background
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Transparent background - no fill needed
 
         // Calculate content height for perfect centering
         const titleHeight = 95;
@@ -165,7 +163,7 @@ export default function HistoryPage() {
         let currentY = (canvas.height - totalHeight) / 2;
 
         // Workout Title - Strava style: Clean, bold, well-spaced
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = '600 64px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
@@ -173,7 +171,7 @@ export default function HistoryPage() {
         currentY += titleHeight + spacing;
 
         // Date - Strava style: Clean, smaller, well-spaced
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = '400 26px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
         ctx.fillText(formatDate(session.date), centerX, currentY);
         currentY += dateHeight + 10;
@@ -181,7 +179,7 @@ export default function HistoryPage() {
         // Duration - Strava style: Same as date, clean spacing
         const durationText = formatDuration(session.duration);
         if (durationText) {
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = '400 26px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
             ctx.fillText(durationText, centerX, currentY);
             currentY += durationHeight + spacing;
@@ -190,7 +188,7 @@ export default function HistoryPage() {
         }
 
         // Subtle horizontal divider - Strava style
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(centerX - 320, currentY);
@@ -201,13 +199,13 @@ export default function HistoryPage() {
         // Exercises List - Strava style: Clean, well-spaced, centered
         session.exercises.forEach((exercise) => {
             // Exercise name - Strava style font sizing
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = '400 36px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
             ctx.fillText(exercise.name, centerX, currentY);
             currentY += 48;
 
             // Sets count - Strava style: Smaller, clean
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = '400 28px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
             ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
             currentY += exerciseItemHeight;
@@ -221,7 +219,7 @@ export default function HistoryPage() {
                 ? `Workout Partners: ${allUsernames.join(' & ')}`
                 : `Group Session: ${allUsernames.join(', ')}`;
             
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = '400 22px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
             ctx.fillText(groupText, centerX, currentY);
             currentY += 40;
@@ -229,7 +227,7 @@ export default function HistoryPage() {
 
         // Brand Signature - Strava style: Clean, bold, well-spaced
         currentY += spacing;
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = '600 30px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
         ctx.fillText('LINKLY', centerX, currentY);
     };
@@ -237,9 +235,7 @@ export default function HistoryPage() {
     const generateModernTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
         const centerX = canvas.width / 2;
         
-        // Clean black background
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Transparent background - no fill needed
 
         // Calculate content height for perfect centering
         const titleHeight = 88;
@@ -256,7 +252,7 @@ export default function HistoryPage() {
         let currentY = (canvas.height - totalHeight) / 2;
 
         // Workout Title - Strava style: Refined, elegant
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = '500 60px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
@@ -264,7 +260,7 @@ export default function HistoryPage() {
         currentY += titleHeight + spacing;
 
         // Date - Strava style: Clean, refined
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = '400 24px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
         ctx.fillText(formatDate(session.date), centerX, currentY);
         currentY += dateHeight + 8;
@@ -272,7 +268,7 @@ export default function HistoryPage() {
         // Duration - Strava style: Same as date, clean
         const durationText = formatDuration(session.duration);
         if (durationText) {
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = '400 24px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
             ctx.fillText(durationText, centerX, currentY);
             currentY += durationHeight + spacing;
@@ -281,7 +277,7 @@ export default function HistoryPage() {
         }
 
         // Subtle horizontal divider - Strava style
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(centerX - 300, currentY);
@@ -292,13 +288,13 @@ export default function HistoryPage() {
         // Exercises List - Strava style: Refined, elegant spacing
         session.exercises.forEach((exercise) => {
             // Exercise name - Strava style font sizing
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = '400 34px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
             ctx.fillText(exercise.name, centerX, currentY);
             currentY += 46;
 
             // Sets count - Strava style: Smaller, refined
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = '400 26px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
             ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
             currentY += exerciseItemHeight;
@@ -312,7 +308,7 @@ export default function HistoryPage() {
                 ? `Workout Partners: ${allUsernames.join(' & ')}`
                 : `Group Session: ${allUsernames.join(', ')}`;
             
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = '400 20px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
             ctx.fillText(groupText, centerX, currentY);
             currentY += 38;
@@ -320,7 +316,7 @@ export default function HistoryPage() {
 
         // Brand Signature - Strava style: Clean, refined
         currentY += spacing;
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = '500 28px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
         ctx.fillText('LINKLY', centerX, currentY);
     };
@@ -459,14 +455,15 @@ export default function HistoryPage() {
         const centerX = canvas.width / 2;
         const scale = canvas.width / 1080;
         
-        // Clean black background
-        ctx.fillStyle = '#000000';
+        // Transparent background for preview (will show on white UI background)
+        // Add light gray background for preview visibility
+        ctx.fillStyle = '#f5f5f5';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         let currentY = 40 * scale;
 
         // Workout Title - Strava style
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = `600 ${64 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
@@ -474,7 +471,7 @@ export default function HistoryPage() {
         currentY += 95 * scale + 50 * scale;
 
         // Date - Strava style
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = `400 ${26 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
         ctx.fillText(formatDate(session.date), centerX, currentY);
         currentY += 32 * scale + 10 * scale;
@@ -482,7 +479,7 @@ export default function HistoryPage() {
         // Duration - Strava style
         const durationText = formatDuration(session.duration);
         if (durationText) {
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = `400 ${26 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
             ctx.fillText(durationText, centerX, currentY);
             currentY += 32 * scale + 50 * scale;
@@ -491,7 +488,7 @@ export default function HistoryPage() {
         }
 
         // Divider line - Strava style
-        ctx.strokeStyle = `rgba(255, 255, 255, 0.3)`;
+        ctx.strokeStyle = `rgba(0, 0, 0, 0.3)`;
         ctx.lineWidth = 1 * scale;
         ctx.beginPath();
         ctx.moveTo(centerX - 320 * scale, currentY);
@@ -501,7 +498,7 @@ export default function HistoryPage() {
 
         // Exercises (simplified) - Strava style
         session.exercises.slice(0, 3).forEach((exercise) => {
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = `400 ${36 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
             ctx.fillText(exercise.name, centerX, currentY);
             currentY += 48 * scale;
@@ -511,7 +508,7 @@ export default function HistoryPage() {
         });
 
         // Brand Signature - Strava style
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = `600 ${30 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
         ctx.fillText('LINKLY', centerX, currentY);
     };
@@ -520,14 +517,14 @@ export default function HistoryPage() {
         const centerX = canvas.width / 2;
         const scale = canvas.width / 1080;
         
-        // Clean black background
-        ctx.fillStyle = '#000000';
+        // Light gray background for preview visibility
+        ctx.fillStyle = '#f5f5f5';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         let currentY = 40 * scale;
 
         // Workout Title - Strava style
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = `500 ${60 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
@@ -535,7 +532,7 @@ export default function HistoryPage() {
         currentY += 88 * scale + 48 * scale;
 
         // Date - Strava style
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = `400 ${24 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
         ctx.fillText(formatDate(session.date), centerX, currentY);
         currentY += 30 * scale + 8 * scale;
@@ -543,7 +540,7 @@ export default function HistoryPage() {
         // Duration - Strava style
         const durationText = formatDuration(session.duration);
         if (durationText) {
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = `400 ${24 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
             ctx.fillText(durationText, centerX, currentY);
             currentY += 30 * scale + 48 * scale;
@@ -552,7 +549,7 @@ export default function HistoryPage() {
         }
 
         // Divider line - Strava style
-        ctx.strokeStyle = `rgba(255, 255, 255, 0.25)`;
+        ctx.strokeStyle = `rgba(0, 0, 0, 0.25)`;
         ctx.lineWidth = 1 * scale;
         ctx.beginPath();
         ctx.moveTo(centerX - 300 * scale, currentY);
@@ -562,7 +559,7 @@ export default function HistoryPage() {
 
         // Exercises (simplified) - Strava style
         session.exercises.slice(0, 3).forEach((exercise) => {
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#000000';
             ctx.font = `400 ${34 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
             ctx.fillText(exercise.name, centerX, currentY);
             currentY += 46 * scale;
@@ -572,7 +569,7 @@ export default function HistoryPage() {
         });
 
         // Brand Signature - Strava style
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.font = `500 ${28 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
         ctx.fillText('LINKLY', centerX, currentY);
     };
