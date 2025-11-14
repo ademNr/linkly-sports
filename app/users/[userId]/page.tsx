@@ -151,17 +151,20 @@ export default function UserProfilePage() {
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center space-x-4 flex-1">
                 <div className="w-24 h-24 bg-gray-900 rounded-full overflow-hidden shadow-xl flex items-center justify-center ring-4 ring-white">
-                  {getUserAvatarUrl({ username: userProfile.username, avatar: userProfile.avatar }) ? (
-                    <img 
-                      src={getUserAvatarUrl({ username: userProfile.username, avatar: userProfile.avatar })} 
-                      alt={userProfile.username}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-4xl font-bold text-white">
-                      {userProfile.username.charAt(0).toUpperCase()}
-                    </span>
-                  )}
+                  {(() => {
+                    const avatarUrl = getUserAvatarUrl({ username: userProfile.username, avatar: userProfile.avatar });
+                    return avatarUrl ? (
+                      <img 
+                        src={avatarUrl} 
+                        alt={userProfile.username}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-4xl font-bold text-white">
+                        {userProfile.username.charAt(0).toUpperCase()}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-2xl font-bold text-gray-900 mb-1 truncate">{userProfile.username}</h3>

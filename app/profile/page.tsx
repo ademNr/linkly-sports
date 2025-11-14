@@ -15,7 +15,7 @@ export default function ProfilePage() {
     const [totalWorkouts, setTotalWorkouts] = useState(0);
     const [lastExercise, setLastExercise] = useState<string | null>(null);
     const [unreadNotifications, setUnreadNotifications] = useState(0);
-    const [stats, setStats] = useState({ streak: 0, totalSets: 0, thisWeekCount: 0, totalHours: 0 });
+    const [stats, setStats] = useState({ streak: 0, totalSets: 0, thisWeekCount: 0, totalHours: 0, totalMinutes: 0 });
     const [recentWorkouts, setRecentWorkouts] = useState<WorkoutSession[]>([]);
     const [avatar, setAvatar] = useState<string | null>(null);
     const [showAvatarModal, setShowAvatarModal] = useState(false);

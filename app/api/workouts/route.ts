@@ -91,6 +91,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        // Extract userId after verification to help TypeScript
+        const userId = session.user.id;
+
         const body = await request.json();
         const { name, type, exercises: workoutExercises, date, duration } = body;
 
@@ -136,7 +139,7 @@ export async function POST(request: NextRequest) {
 
         // Create workout session
         const workout: any = {
-            userId: session.user.id,
+            userId: userId,
             name,
             type,
             date: workoutDate,
@@ -149,7 +152,7 @@ export async function POST(request: NextRequest) {
         if (requiresAcceptance) {
             workout.isGroupSession = true;
             workout.pendingAcceptance = pendingAcceptance;
-            workout.acceptedBy = [session.user.id]; // Creator auto-accepts
+            workout.acceptedBy = [userId]; // Creator auto-accepts
         }
 
         const result = await workoutsCollection.insertOne(workout);
@@ -160,11 +163,11 @@ export async function POST(request: NextRequest) {
         const lastMuscleGroup = exercises.length > 0 ? exercises[0].muscleGroup : undefined;
 
         // Get user's current totalSets to calculate properly
-        const currentUser = await usersCollection.findOne({ _id: new ObjectId(session.user.id) });
+        const currentUser = await usersCollection.findOne({ _id: new ObjectId(userId) });
         const currentTotalSets = currentUser?.totalSets || 0;
 
         await usersCollection.updateOne(
-            { _id: new ObjectId(session.user.id) },
+            { _id: new ObjectId(userId) },
             {
                 $set: {
                     lastWorkoutDate: workoutDate,
@@ -184,7 +187,7 @@ export async function POST(request: NextRequest) {
             const friendshipsCollection = db.collection(COLLECTIONS.FRIENDSHIPS);
             
             // Get creator username
-            const creator = await usersCollection.findOne({ _id: new ObjectId(session.user.id) });
+            const creator = await usersCollection.findOne({ _id: new ObjectId(userId) });
             const creatorUsername = creator?.username || 'User';
 
             // Create gym partner relationships automatically for all shared users
@@ -192,15 +195,15 @@ export async function POST(request: NextRequest) {
                 // Check if friendship already exists
                 const existingFriendship = await friendshipsCollection.findOne({
                     $or: [
-                        { userId1: session.user.id, userId2: sharedUserId },
-                        { userId1: sharedUserId, userId2: session.user.id },
+                        { userId1: userId, userId2: sharedUserId },
+                        { userId1: sharedUserId, userId2: userId },
                     ],
                 });
 
                 if (!existingFriendship) {
                     // Create gym partner relationship
                     await friendshipsCollection.insertOne({
-                        userId1: session.user.id,
+                        userId1: userId,
                         userId2: sharedUserId,
                         type: 'gym_partner',
                         createdAt: now,
@@ -216,10 +219,10 @@ export async function POST(request: NextRequest) {
 
             if (requiresAcceptance) {
                 // Send notifications for group session acceptance
-                const groupSessionNotifications = pendingAcceptance.map((userId: string) => ({
-                    userId: userId,
+                const groupSessionNotifications = pendingAcceptance.map((pendingUserId: string) => ({
+                    userId: pendingUserId,
                     type: 'group_session_request' as const,
-                    fromUserId: session.user.id,
+                    fromUserId: userId,
                     fromUsername: creatorUsername,
                     workoutId: result.insertedId.toString(),
                     read: false,
@@ -231,7 +234,7 @@ export async function POST(request: NextRequest) {
                 const sharedWorkoutNotifications = sharedWith.map((sharedUserId: string) => ({
                     userId: sharedUserId,
                     type: 'shared_workout' as const,
-                    fromUserId: session.user.id,
+                    fromUserId: userId,
                     fromUsername: creatorUsername,
                     workoutId: result.insertedId.toString(),
                     read: false,
