@@ -6,7 +6,7 @@ import { WorkoutSession } from '@/types';
 import Navigation from '@/components/layout/Navigation';
 import { Calendar, Clock, Dumbbell, Activity, Download, ArrowLeft, Image, X, Share2, Users } from 'lucide-react';
 
-type TemplateType = 'bold' | 'modern';
+type TemplateType = 'transparent' | 'story' | 'fire' | 'minimal' | 'gradient';
 
 export default function HistoryPage() {
     const router = useRouter();
@@ -15,7 +15,7 @@ export default function HistoryPage() {
     const [sessions, setSessions] = useState<WorkoutSession[]>([]);
     const [selectedSession, setSelectedSession] = useState<WorkoutSession | null>(null);
     const [showTemplates, setShowTemplates] = useState(false);
-    const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('bold');
+    const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('transparent');
     const [generating, setGenerating] = useState(false);
     const [filter, setFilter] = useState<'all' | 'today' | 'week'>('all');
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -106,10 +106,24 @@ export default function HistoryPage() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Use selected template
-            if (template === 'bold') {
-                generateBoldTemplate(ctx, session, canvas);
-            } else {
-                generateModernTemplate(ctx, session, canvas);
+            switch (template) {
+                case 'transparent':
+                    generateTransparentTemplate(ctx, session, canvas);
+                    break;
+                case 'story':
+                    generateStoryTemplate(ctx, session, canvas);
+                    break;
+                case 'fire':
+                    generateFireTemplate(ctx, session, canvas);
+                    break;
+                case 'minimal':
+                    generateMinimalTemplate(ctx, session, canvas);
+                    break;
+                case 'gradient':
+                    generateGradientTemplate(ctx, session, canvas);
+                    break;
+                default:
+                    generateTransparentTemplate(ctx, session, canvas);
             }
 
             // Don't auto-download, let user choose
@@ -143,75 +157,97 @@ export default function HistoryPage() {
     };
 
 
-    const generateBoldTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
+    // Helper function to draw fire icon
+    const drawFireIcon = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
+        ctx.save();
+        ctx.translate(x, y);
+        
+        // Fire shape
+        ctx.beginPath();
+        ctx.moveTo(0, size * 0.3);
+        ctx.bezierCurveTo(-size * 0.2, size * 0.1, -size * 0.3, -size * 0.1, 0, -size * 0.2);
+        ctx.bezierCurveTo(size * 0.3, -size * 0.1, size * 0.2, size * 0.1, 0, size * 0.3);
+        ctx.closePath();
+        
+        // Gradient for fire
+        const gradient = ctx.createLinearGradient(0, -size * 0.2, 0, size * 0.3);
+        gradient.addColorStop(0, '#FF6B35');
+        gradient.addColorStop(0.5, '#F7931E');
+        gradient.addColorStop(1, '#FFD23F');
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        ctx.restore();
+    };
+
+    // Template 1: Transparent - Clean, transparent background with black text
+    const generateTransparentTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
         const centerX = canvas.width / 2;
         
         // Transparent background - no fill needed
 
         // Calculate content height for perfect centering
-        const titleHeight = 95;
-        const dateHeight = 32;
-        const durationHeight = 32;
-        const dividerHeight = 25;
-        const exerciseItemHeight = 75;
+        const titleHeight = 120;
+        const dateHeight = 38;
+        const durationHeight = 38;
+        const dividerHeight = 30;
+        const exerciseItemHeight = 90;
         const exercisesHeight = session.exercises.length * exerciseItemHeight;
-        const groupHeight = (session.sharedUsernames && session.sharedUsernames.length > 0) ? 40 : 0;
-        const brandHeight = 45;
-        const spacing = 50;
+        const groupHeight = (session.sharedUsernames && session.sharedUsernames.length > 0) ? 50 : 0;
+        const brandHeight = 55;
+        const spacing = 60;
         
         const totalHeight = titleHeight + dateHeight + durationHeight + dividerHeight + exercisesHeight + groupHeight + brandHeight + (spacing * 5);
         let currentY = (canvas.height - totalHeight) / 2;
 
-        // Workout Title - Strava style: Clean, bold, well-spaced
+        // Workout Title - Large, bold, Roboto
         ctx.fillStyle = '#000000';
-        ctx.font = '600 64px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+        ctx.font = '700 80px "Roboto", "Arial", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillText(session.name.toUpperCase(), centerX, currentY);
         currentY += titleHeight + spacing;
 
-        // Date - Strava style: Clean, smaller, well-spaced
+        // Date - Roboto, clean
         ctx.fillStyle = '#000000';
-        ctx.font = '400 26px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+        ctx.font = '400 32px "Roboto", "Arial", sans-serif';
         ctx.fillText(formatDate(session.date), centerX, currentY);
-        currentY += dateHeight + 10;
+        currentY += dateHeight + 12;
 
-        // Duration - Strava style: Same as date, clean spacing
+        // Duration - Roboto
         const durationText = formatDuration(session.duration);
         if (durationText) {
             ctx.fillStyle = '#000000';
-            ctx.font = '400 26px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            ctx.font = '400 32px "Roboto", "Arial", sans-serif';
             ctx.fillText(durationText, centerX, currentY);
             currentY += durationHeight + spacing;
         } else {
             currentY += spacing;
         }
 
-        // Subtle horizontal divider - Strava style
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.lineWidth = 1;
+        // Subtle horizontal divider
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(centerX - 320, currentY);
-        ctx.lineTo(centerX + 320, currentY);
+        ctx.moveTo(centerX - 350, currentY);
+        ctx.lineTo(centerX + 350, currentY);
         ctx.stroke();
         currentY += dividerHeight + spacing;
 
-        // Exercises List - Strava style: Clean, well-spaced, centered
+        // Exercises List - Larger, clearer
         session.exercises.forEach((exercise) => {
-            // Exercise name - Strava style font sizing
             ctx.fillStyle = '#000000';
-            ctx.font = '400 36px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            ctx.font = '500 42px "Roboto", "Arial", sans-serif';
             ctx.fillText(exercise.name, centerX, currentY);
-            currentY += 48;
+            currentY += 56;
 
-            // Sets count - Strava style: Smaller, clean
-            ctx.fillStyle = '#000000';
-            ctx.font = '400 28px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            ctx.fillStyle = '#333333';
+            ctx.font = '400 32px "Roboto", "Arial", sans-serif';
             ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
             currentY += exerciseItemHeight;
         });
 
-        // Group session info (if shared) - Strava style
+        // Group session info
         if (session.sharedUsernames && session.sharedUsernames.length > 0) {
             currentY += spacing;
             const allUsernames = [session.ownerUsername || 'User', ...session.sharedUsernames];
@@ -219,88 +255,93 @@ export default function HistoryPage() {
                 ? `Workout Partners: ${allUsernames.join(' & ')}`
                 : `Group Session: ${allUsernames.join(', ')}`;
             
-            ctx.fillStyle = '#000000';
-            ctx.font = '400 22px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            ctx.fillStyle = '#666666';
+            ctx.font = '400 26px "Roboto", "Arial", sans-serif';
             ctx.fillText(groupText, centerX, currentY);
-            currentY += 40;
+            currentY += 50;
         }
 
-        // Brand Signature - Strava style: Clean, bold, well-spaced
+        // Brand Signature
         currentY += spacing;
         ctx.fillStyle = '#000000';
-        ctx.font = '600 30px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+        ctx.font = '700 36px "Roboto", "Arial", sans-serif';
         ctx.fillText('LINKLY', centerX, currentY);
     };
 
-    const generateModernTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
+    // Template 2: Story - Beautiful gradient background for Instagram Stories
+    const generateStoryTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
         const centerX = canvas.width / 2;
         
-        // Transparent background - no fill needed
+        // Beautiful gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(0.5, '#764ba2');
+        gradient.addColorStop(1, '#f093fb');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Calculate content height for perfect centering
-        const titleHeight = 88;
-        const dateHeight = 30;
-        const durationHeight = 30;
-        const dividerHeight = 22;
-        const exerciseItemHeight = 72;
+        // Calculate content height
+        const titleHeight = 130;
+        const dateHeight = 40;
+        const durationHeight = 40;
+        const dividerHeight = 35;
+        const exerciseItemHeight = 95;
         const exercisesHeight = session.exercises.length * exerciseItemHeight;
-        const groupHeight = (session.sharedUsernames && session.sharedUsernames.length > 0) ? 38 : 0;
-        const brandHeight = 42;
-        const spacing = 48;
+        const groupHeight = (session.sharedUsernames && session.sharedUsernames.length > 0) ? 55 : 0;
+        const brandHeight = 60;
+        const spacing = 65;
         
         const totalHeight = titleHeight + dateHeight + durationHeight + dividerHeight + exercisesHeight + groupHeight + brandHeight + (spacing * 5);
         let currentY = (canvas.height - totalHeight) / 2;
 
-        // Workout Title - Strava style: Refined, elegant
-        ctx.fillStyle = '#000000';
-        ctx.font = '500 60px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+        // Workout Title - Large, bold, white
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 88px "Roboto", "Arial", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillText(session.name.toUpperCase(), centerX, currentY);
         currentY += titleHeight + spacing;
 
-        // Date - Strava style: Clean, refined
-        ctx.fillStyle = '#000000';
-        ctx.font = '400 24px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+        // Date - White, Roboto
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '400 34px "Roboto", "Arial", sans-serif';
         ctx.fillText(formatDate(session.date), centerX, currentY);
-        currentY += dateHeight + 8;
+        currentY += dateHeight + 14;
 
-        // Duration - Strava style: Same as date, clean
+        // Duration - White
         const durationText = formatDuration(session.duration);
         if (durationText) {
-            ctx.fillStyle = '#000000';
-            ctx.font = '400 24px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '400 34px "Roboto", "Arial", sans-serif';
             ctx.fillText(durationText, centerX, currentY);
             currentY += durationHeight + spacing;
         } else {
             currentY += spacing;
         }
 
-        // Subtle horizontal divider - Strava style
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
-        ctx.lineWidth = 1;
+        // Elegant divider
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(centerX - 300, currentY);
-        ctx.lineTo(centerX + 300, currentY);
+        ctx.moveTo(centerX - 360, currentY);
+        ctx.lineTo(centerX + 360, currentY);
         ctx.stroke();
         currentY += dividerHeight + spacing;
 
-        // Exercises List - Strava style: Refined, elegant spacing
+        // Exercises List - White, larger
         session.exercises.forEach((exercise) => {
-            // Exercise name - Strava style font sizing
-            ctx.fillStyle = '#000000';
-            ctx.font = '400 34px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '500 44px "Roboto", "Arial", sans-serif';
             ctx.fillText(exercise.name, centerX, currentY);
-            currentY += 46;
+            currentY += 58;
 
-            // Sets count - Strava style: Smaller, refined
-            ctx.fillStyle = '#000000';
-            ctx.font = '400 26px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = '400 34px "Roboto", "Arial", sans-serif';
             ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
             currentY += exerciseItemHeight;
         });
 
-        // Group session info (if shared) - Strava style
+        // Group session info
         if (session.sharedUsernames && session.sharedUsernames.length > 0) {
             currentY += spacing;
             const allUsernames = [session.ownerUsername || 'User', ...session.sharedUsernames];
@@ -308,16 +349,312 @@ export default function HistoryPage() {
                 ? `Workout Partners: ${allUsernames.join(' & ')}`
                 : `Group Session: ${allUsernames.join(', ')}`;
             
-            ctx.fillStyle = '#000000';
-            ctx.font = '400 20px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.font = '400 28px "Roboto", "Arial", sans-serif';
             ctx.fillText(groupText, centerX, currentY);
-            currentY += 38;
+            currentY += 55;
         }
 
-        // Brand Signature - Strava style: Clean, refined
+        // Brand Signature
+        currentY += spacing;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 38px "Roboto", "Arial", sans-serif';
+        ctx.fillText('LINKLY', centerX, currentY);
+    };
+
+    // Template 3: Fire - Inspiring with fire icon
+    const generateFireTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
+        const centerX = canvas.width / 2;
+        
+        // Dark background with subtle gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#1a1a1a');
+        gradient.addColorStop(1, '#000000');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Calculate content height
+        const iconSize = 120;
+        const titleHeight = 110;
+        const dateHeight = 36;
+        const durationHeight = 36;
+        const dividerHeight = 32;
+        const exerciseItemHeight = 88;
+        const exercisesHeight = session.exercises.length * exerciseItemHeight;
+        const groupHeight = (session.sharedUsernames && session.sharedUsernames.length > 0) ? 52 : 0;
+        const brandHeight = 58;
+        const spacing = 58;
+        
+        const totalHeight = iconSize + titleHeight + dateHeight + durationHeight + dividerHeight + exercisesHeight + groupHeight + brandHeight + (spacing * 6);
+        let currentY = (canvas.height - totalHeight) / 2;
+
+        // Fire icon at top
+        drawFireIcon(ctx, centerX, currentY + iconSize / 2, iconSize);
+        currentY += iconSize + spacing;
+
+        // Workout Title - Large, bold, orange gradient
+        const titleGradient = ctx.createLinearGradient(centerX - 200, currentY, centerX + 200, currentY);
+        titleGradient.addColorStop(0, '#FF6B35');
+        titleGradient.addColorStop(0.5, '#F7931E');
+        titleGradient.addColorStop(1, '#FFD23F');
+        ctx.fillStyle = titleGradient;
+        ctx.font = '700 84px "Roboto", "Arial", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(session.name.toUpperCase(), centerX, currentY);
+        currentY += titleHeight + spacing;
+
+        // Date - White
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '400 30px "Roboto", "Arial", sans-serif';
+        ctx.fillText(formatDate(session.date), centerX, currentY);
+        currentY += dateHeight + 10;
+
+        // Duration - White
+        const durationText = formatDuration(session.duration);
+        if (durationText) {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '400 30px "Roboto", "Arial", sans-serif';
+            ctx.fillText(durationText, centerX, currentY);
+            currentY += durationHeight + spacing;
+        } else {
+            currentY += spacing;
+        }
+
+        // Divider with glow
+        ctx.strokeStyle = 'rgba(255, 107, 53, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#FF6B35';
+        ctx.beginPath();
+        ctx.moveTo(centerX - 340, currentY);
+        ctx.lineTo(centerX + 340, currentY);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        currentY += dividerHeight + spacing;
+
+        // Exercises List - White, larger
+        session.exercises.forEach((exercise) => {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '500 40px "Roboto", "Arial", sans-serif';
+            ctx.fillText(exercise.name, centerX, currentY);
+            currentY += 54;
+
+            ctx.fillStyle = '#FF6B35';
+            ctx.font = '400 32px "Roboto", "Arial", sans-serif';
+            ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
+            currentY += exerciseItemHeight;
+        });
+
+        // Group session info
+        if (session.sharedUsernames && session.sharedUsernames.length > 0) {
+            currentY += spacing;
+            const allUsernames = [session.ownerUsername || 'User', ...session.sharedUsernames];
+            const groupText = session.sharedUsernames.length === 1 
+                ? `Workout Partners: ${allUsernames.join(' & ')}`
+                : `Group Session: ${allUsernames.join(', ')}`;
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '400 24px "Roboto", "Arial", sans-serif';
+            ctx.fillText(groupText, centerX, currentY);
+            currentY += 52;
+        }
+
+        // Brand Signature - Orange gradient
+        currentY += spacing;
+        const brandGradient = ctx.createLinearGradient(centerX - 100, currentY, centerX + 100, currentY);
+        brandGradient.addColorStop(0, '#FF6B35');
+        brandGradient.addColorStop(1, '#FFD23F');
+        ctx.fillStyle = brandGradient;
+        ctx.font = '700 34px "Roboto", "Arial", sans-serif';
+        ctx.fillText('LINKLY', centerX, currentY);
+    };
+
+    // Template 4: Minimal - Ultra clean and minimal
+    const generateMinimalTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
+        const centerX = canvas.width / 2;
+        
+        // Transparent background
+
+        // Calculate content height
+        const titleHeight = 100;
+        const dateHeight = 34;
+        const durationHeight = 34;
+        const dividerHeight = 28;
+        const exerciseItemHeight = 82;
+        const exercisesHeight = session.exercises.length * exerciseItemHeight;
+        const groupHeight = (session.sharedUsernames && session.sharedUsernames.length > 0) ? 48 : 0;
+        const brandHeight = 50;
+        const spacing = 55;
+        
+        const totalHeight = titleHeight + dateHeight + durationHeight + dividerHeight + exercisesHeight + groupHeight + brandHeight + (spacing * 5);
+        let currentY = (canvas.height - totalHeight) / 2;
+
+        // Workout Title - Minimal, clean
+        ctx.fillStyle = '#000000';
+        ctx.font = '300 72px "Roboto", "Arial", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(session.name.toUpperCase(), centerX, currentY);
+        currentY += titleHeight + spacing;
+
+        // Date - Minimal
+        ctx.fillStyle = '#666666';
+        ctx.font = '300 28px "Roboto", "Arial", sans-serif';
+        ctx.fillText(formatDate(session.date), centerX, currentY);
+        currentY += dateHeight + 10;
+
+        // Duration - Minimal
+        const durationText = formatDuration(session.duration);
+        if (durationText) {
+            ctx.fillStyle = '#666666';
+            ctx.font = '300 28px "Roboto", "Arial", sans-serif';
+            ctx.fillText(durationText, centerX, currentY);
+            currentY += durationHeight + spacing;
+        } else {
+            currentY += spacing;
+        }
+
+        // Minimal divider
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 330, currentY);
+        ctx.lineTo(centerX + 330, currentY);
+        ctx.stroke();
+        currentY += dividerHeight + spacing;
+
+        // Exercises List - Minimal
+        session.exercises.forEach((exercise) => {
+            ctx.fillStyle = '#000000';
+            ctx.font = '300 38px "Roboto", "Arial", sans-serif';
+            ctx.fillText(exercise.name, centerX, currentY);
+            currentY += 52;
+
+            ctx.fillStyle = '#999999';
+            ctx.font = '300 28px "Roboto", "Arial", sans-serif';
+            ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
+            currentY += exerciseItemHeight;
+        });
+
+        // Group session info
+        if (session.sharedUsernames && session.sharedUsernames.length > 0) {
+            currentY += spacing;
+            const allUsernames = [session.ownerUsername || 'User', ...session.sharedUsernames];
+            const groupText = session.sharedUsernames.length === 1 
+                ? `Workout Partners: ${allUsernames.join(' & ')}`
+                : `Group Session: ${allUsernames.join(', ')}`;
+            
+            ctx.fillStyle = '#888888';
+            ctx.font = '300 22px "Roboto", "Arial", sans-serif';
+            ctx.fillText(groupText, centerX, currentY);
+            currentY += 48;
+        }
+
+        // Brand Signature - Minimal
         currentY += spacing;
         ctx.fillStyle = '#000000';
-        ctx.font = '500 28px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+        ctx.font = '300 32px "Roboto", "Arial", sans-serif';
+        ctx.fillText('LINKLY', centerX, currentY);
+    };
+
+    // Template 5: Gradient - Modern gradient design
+    const generateGradientTemplate = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
+        const centerX = canvas.width / 2;
+        
+        // Modern gradient background
+        const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        bgGradient.addColorStop(0, '#0f0c29');
+        bgGradient.addColorStop(0.5, '#302b63');
+        bgGradient.addColorStop(1, '#24243e');
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Calculate content height
+        const titleHeight = 125;
+        const dateHeight = 38;
+        const durationHeight = 38;
+        const dividerHeight = 32;
+        const exerciseItemHeight = 92;
+        const exercisesHeight = session.exercises.length * exerciseItemHeight;
+        const groupHeight = (session.sharedUsernames && session.sharedUsernames.length > 0) ? 52 : 0;
+        const brandHeight = 58;
+        const spacing = 62;
+        
+        const totalHeight = titleHeight + dateHeight + durationHeight + dividerHeight + exercisesHeight + groupHeight + brandHeight + (spacing * 5);
+        let currentY = (canvas.height - totalHeight) / 2;
+
+        // Workout Title - Gradient text
+        const titleGradient = ctx.createLinearGradient(centerX - 250, currentY, centerX + 250, currentY);
+        titleGradient.addColorStop(0, '#a8edea');
+        titleGradient.addColorStop(1, '#fed6e3');
+        ctx.fillStyle = titleGradient;
+        ctx.font = '700 86px "Roboto", "Arial", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(session.name.toUpperCase(), centerX, currentY);
+        currentY += titleHeight + spacing;
+
+        // Date - White
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '400 32px "Roboto", "Arial", sans-serif';
+        ctx.fillText(formatDate(session.date), centerX, currentY);
+        currentY += dateHeight + 12;
+
+        // Duration - White
+        const durationText = formatDuration(session.duration);
+        if (durationText) {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '400 32px "Roboto", "Arial", sans-serif';
+            ctx.fillText(durationText, centerX, currentY);
+            currentY += durationHeight + spacing;
+        } else {
+            currentY += spacing;
+        }
+
+        // Elegant divider
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 350, currentY);
+        ctx.lineTo(centerX + 350, currentY);
+        ctx.stroke();
+        currentY += dividerHeight + spacing;
+
+        // Exercises List - White, larger
+        session.exercises.forEach((exercise) => {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '500 42px "Roboto", "Arial", sans-serif';
+            ctx.fillText(exercise.name, centerX, currentY);
+            currentY += 56;
+
+            ctx.fillStyle = '#a8edea';
+            ctx.font = '400 32px "Roboto", "Arial", sans-serif';
+            ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
+            currentY += exerciseItemHeight;
+        });
+
+        // Group session info
+        if (session.sharedUsernames && session.sharedUsernames.length > 0) {
+            currentY += spacing;
+            const allUsernames = [session.ownerUsername || 'User', ...session.sharedUsernames];
+            const groupText = session.sharedUsernames.length === 1 
+                ? `Workout Partners: ${allUsernames.join(' & ')}`
+                : `Group Session: ${allUsernames.join(', ')}`;
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = '400 26px "Roboto", "Arial", sans-serif';
+            ctx.fillText(groupText, centerX, currentY);
+            currentY += 52;
+        }
+
+        // Brand Signature - Gradient
+        currentY += spacing;
+        const brandGradient = ctx.createLinearGradient(centerX - 100, currentY, centerX + 100, currentY);
+        brandGradient.addColorStop(0, '#a8edea');
+        brandGradient.addColorStop(1, '#fed6e3');
+        ctx.fillStyle = brandGradient;
+        ctx.font = '700 36px "Roboto", "Arial", sans-serif';
         ctx.fillText('LINKLY', centerX, currentY);
     };
 
@@ -368,7 +705,7 @@ export default function HistoryPage() {
     };
 
     const handleDownload = () => {
-        if (!selectedSession) return;
+        if (!selectedSession || !selectedTemplate) return;
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -381,10 +718,22 @@ export default function HistoryPage() {
             canvas.height = 1920;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (selectedTemplate === 'bold') {
-                generateBoldTemplate(ctx, selectedSession, canvas);
-            } else {
-                generateModernTemplate(ctx, selectedSession, canvas);
+            switch (selectedTemplate) {
+                case 'transparent':
+                    generateTransparentTemplate(ctx, selectedSession, canvas);
+                    break;
+                case 'story':
+                    generateStoryTemplate(ctx, selectedSession, canvas);
+                    break;
+                case 'fire':
+                    generateFireTemplate(ctx, selectedSession, canvas);
+                    break;
+                case 'minimal':
+                    generateMinimalTemplate(ctx, selectedSession, canvas);
+                    break;
+                case 'gradient':
+                    generateGradientTemplate(ctx, selectedSession, canvas);
+                    break;
             }
 
             downloadImage(selectedSession, selectedTemplate);
@@ -394,7 +743,7 @@ export default function HistoryPage() {
     };
 
     const handleShare = async () => {
-        if (!selectedSession) return;
+        if (!selectedSession || !selectedTemplate) return;
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -412,10 +761,22 @@ export default function HistoryPage() {
             canvas.height = 1920;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (selectedTemplate === 'bold') {
-                generateBoldTemplate(ctx, selectedSession, canvas);
-            } else {
-                generateModernTemplate(ctx, selectedSession, canvas);
+            switch (selectedTemplate) {
+                case 'transparent':
+                    generateTransparentTemplate(ctx, selectedSession, canvas);
+                    break;
+                case 'story':
+                    generateStoryTemplate(ctx, selectedSession, canvas);
+                    break;
+                case 'fire':
+                    generateFireTemplate(ctx, selectedSession, canvas);
+                    break;
+                case 'minimal':
+                    generateMinimalTemplate(ctx, selectedSession, canvas);
+                    break;
+                case 'gradient':
+                    generateGradientTemplate(ctx, selectedSession, canvas);
+                    break;
             }
 
             shareImage(selectedSession, selectedTemplate);
@@ -425,9 +786,42 @@ export default function HistoryPage() {
         }, 100);
     };
 
+    // Helper function to generate preview for any template
+    const generatePreview = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement, template: TemplateType) => {
+        // Create a temporary full-size canvas to generate the template
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 1080;
+        tempCanvas.height = 1920;
+        const tempCtx = tempCanvas.getContext('2d');
+        if (!tempCtx) return;
+        
+        // Generate the template on the full-size canvas
+        switch (template) {
+            case 'transparent':
+                generateTransparentTemplate(tempCtx, session, tempCanvas);
+                break;
+            case 'story':
+                generateStoryTemplate(tempCtx, session, tempCanvas);
+                break;
+            case 'fire':
+                generateFireTemplate(tempCtx, session, tempCanvas);
+                break;
+            case 'minimal':
+                generateMinimalTemplate(tempCtx, session, tempCanvas);
+                break;
+            case 'gradient':
+                generateGradientTemplate(tempCtx, session, tempCanvas);
+                break;
+        }
+        
+        // Draw the scaled-down version to the preview canvas
+        ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+    };
+
     useEffect(() => {
         if (selectedSession && showTemplates) {
-            ['bold', 'modern'].forEach((template) => {
+            const templates: TemplateType[] = ['transparent', 'story', 'fire', 'minimal', 'gradient'];
+            templates.forEach((template) => {
                 setTimeout(() => {
                     const canvasId = `preview-${template}`;
                     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -439,11 +833,13 @@ export default function HistoryPage() {
                             canvas.height = 640;
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             
-                            if (template === 'bold') {
-                                generateBoldTemplatePreview(ctx, selectedSession, canvas);
-                            } else {
-                                generateModernTemplatePreview(ctx, selectedSession, canvas);
+                            // For preview, add a light background if transparent
+                            if (template === 'transparent' || template === 'minimal') {
+                                ctx.fillStyle = '#f5f5f5';
+                                ctx.fillRect(0, 0, canvas.width, canvas.height);
                             }
+                            
+                            generatePreview(ctx, selectedSession, canvas, template);
                         }
                     }
                 }, 100);
@@ -451,128 +847,6 @@ export default function HistoryPage() {
         }
     }, [selectedSession, showTemplates]);
 
-    const generateBoldTemplatePreview = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
-        const centerX = canvas.width / 2;
-        const scale = canvas.width / 1080;
-        
-        // Transparent background for preview (will show on white UI background)
-        // Add light gray background for preview visibility
-        ctx.fillStyle = '#f5f5f5';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        let currentY = 40 * scale;
-
-        // Workout Title - Strava style
-        ctx.fillStyle = '#000000';
-        ctx.font = `600 ${64 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(session.name.toUpperCase(), centerX, currentY);
-        currentY += 95 * scale + 50 * scale;
-
-        // Date - Strava style
-        ctx.fillStyle = '#000000';
-        ctx.font = `400 ${26 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-        ctx.fillText(formatDate(session.date), centerX, currentY);
-        currentY += 32 * scale + 10 * scale;
-
-        // Duration - Strava style
-        const durationText = formatDuration(session.duration);
-        if (durationText) {
-            ctx.fillStyle = '#000000';
-            ctx.font = `400 ${26 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-            ctx.fillText(durationText, centerX, currentY);
-            currentY += 32 * scale + 50 * scale;
-        } else {
-            currentY += 50 * scale;
-        }
-
-        // Divider line - Strava style
-        ctx.strokeStyle = `rgba(0, 0, 0, 0.3)`;
-        ctx.lineWidth = 1 * scale;
-        ctx.beginPath();
-        ctx.moveTo(centerX - 320 * scale, currentY);
-        ctx.lineTo(centerX + 320 * scale, currentY);
-        ctx.stroke();
-        currentY += 25 * scale + 50 * scale;
-
-        // Exercises (simplified) - Strava style
-        session.exercises.slice(0, 3).forEach((exercise) => {
-            ctx.fillStyle = '#000000';
-            ctx.font = `400 ${36 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-            ctx.fillText(exercise.name, centerX, currentY);
-            currentY += 48 * scale;
-            ctx.font = `400 ${28 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-            ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
-            currentY += 75 * scale;
-        });
-
-        // Brand Signature - Strava style
-        ctx.fillStyle = '#000000';
-        ctx.font = `600 ${30 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-        ctx.fillText('LINKLY', centerX, currentY);
-    };
-
-    const generateModernTemplatePreview = (ctx: CanvasRenderingContext2D, session: WorkoutSession, canvas: HTMLCanvasElement) => {
-        const centerX = canvas.width / 2;
-        const scale = canvas.width / 1080;
-        
-        // Light gray background for preview visibility
-        ctx.fillStyle = '#f5f5f5';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        let currentY = 40 * scale;
-
-        // Workout Title - Strava style
-        ctx.fillStyle = '#000000';
-        ctx.font = `500 ${60 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(session.name.toUpperCase(), centerX, currentY);
-        currentY += 88 * scale + 48 * scale;
-
-        // Date - Strava style
-        ctx.fillStyle = '#000000';
-        ctx.font = `400 ${24 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-        ctx.fillText(formatDate(session.date), centerX, currentY);
-        currentY += 30 * scale + 8 * scale;
-
-        // Duration - Strava style
-        const durationText = formatDuration(session.duration);
-        if (durationText) {
-            ctx.fillStyle = '#000000';
-            ctx.font = `400 ${24 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-            ctx.fillText(durationText, centerX, currentY);
-            currentY += 30 * scale + 48 * scale;
-        } else {
-            currentY += 48 * scale;
-        }
-
-        // Divider line - Strava style
-        ctx.strokeStyle = `rgba(0, 0, 0, 0.25)`;
-        ctx.lineWidth = 1 * scale;
-        ctx.beginPath();
-        ctx.moveTo(centerX - 300 * scale, currentY);
-        ctx.lineTo(centerX + 300 * scale, currentY);
-        ctx.stroke();
-        currentY += 22 * scale + 48 * scale;
-
-        // Exercises (simplified) - Strava style
-        session.exercises.slice(0, 3).forEach((exercise) => {
-            ctx.fillStyle = '#000000';
-            ctx.font = `400 ${34 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-            ctx.fillText(exercise.name, centerX, currentY);
-            currentY += 46 * scale;
-            ctx.font = `400 ${26 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-            ctx.fillText(`${exercise.setsCompleted} sets`, centerX, currentY);
-            currentY += 72 * scale;
-        });
-
-        // Brand Signature - Strava style
-        ctx.fillStyle = '#000000';
-        ctx.font = `500 ${28 * scale}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-        ctx.fillText('LINKLY', centerX, currentY);
-    };
 
 
     return (
@@ -731,44 +1005,54 @@ export default function HistoryPage() {
                                 {/* Template Cards Grid */}
                                 <div className="p-6 pb-8">
                                     <div className="grid grid-cols-2 gap-3 mb-6">
-                                        {(['bold', 'modern'] as TemplateType[]).map((template) => (
-                                            <div
-                                                key={template}
-                                                onClick={() => setSelectedTemplate(template)}
-                                                className={`relative cursor-pointer rounded-2xl overflow-hidden transition-all ${
-                                                    selectedTemplate === template
-                                                        ? 'ring-2 ring-gray-900 ring-offset-2 shadow-lg scale-[1.02]'
-                                                        : 'border-2 border-gray-200 hover:border-gray-300 hover:shadow-md'
-                                                }`}
-                                            >
-                                                {/* Preview Canvas Container */}
-                                                <div className="bg-gradient-to-br from-gray-900 to-black p-2">
-                                                    <div className="bg-gray-800 rounded-lg overflow-hidden" style={{ aspectRatio: '9/16' }}>
-                                                        <canvas
-                                                            id={`preview-${template}`}
-                                                            className="w-full h-full"
-                                                            style={{ display: 'block' }}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                {/* Template Info Overlay */}
-                                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-2.5">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="text-white font-semibold text-xs mb-0.5 truncate">
-                                                                {template === 'bold' ? 'Bold' : 'Modern'}
-                                                            </div>
+                                        {(['transparent', 'story', 'fire', 'minimal', 'gradient'] as TemplateType[]).map((template) => {
+                                            const templateNames: { [key in TemplateType]: string } = {
+                                                transparent: 'Transparent',
+                                                story: 'Story',
+                                                fire: 'Fire',
+                                                minimal: 'Minimal',
+                                                gradient: 'Gradient',
+                                            };
+                                            
+                                            return (
+                                                <div
+                                                    key={template}
+                                                    onClick={() => setSelectedTemplate(template)}
+                                                    className={`relative cursor-pointer rounded-2xl overflow-hidden transition-all ${
+                                                        selectedTemplate === template
+                                                            ? 'ring-2 ring-gray-900 ring-offset-2 shadow-lg scale-[1.02]'
+                                                            : 'border-2 border-gray-200 hover:border-gray-300 hover:shadow-md'
+                                                    }`}
+                                                >
+                                                    {/* Preview Canvas Container */}
+                                                    <div className="bg-gradient-to-br from-gray-900 to-black p-2">
+                                                        <div className="bg-gray-800 rounded-lg overflow-hidden" style={{ aspectRatio: '9/16' }}>
+                                                            <canvas
+                                                                id={`preview-${template}`}
+                                                                className="w-full h-full"
+                                                                style={{ display: 'block' }}
+                                                            />
                                                         </div>
-                                                        {selectedTemplate === template && (
-                                                            <div className="w-5 h-5 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
-                                                                <span className="text-white text-[10px] font-bold">✓</span>
+                                                    </div>
+
+                                                    {/* Template Info Overlay */}
+                                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-2.5">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="text-white font-semibold text-xs mb-0.5 truncate">
+                                                                    {templateNames[template]}
+                                                                </div>
                                                             </div>
-                                                        )}
+                                                            {selectedTemplate === template && (
+                                                                <div className="w-5 h-5 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
+                                                                    <span className="text-white text-[10px] font-bold">✓</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
 
                                     {/* Selected Template Actions */}
