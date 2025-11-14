@@ -97,39 +97,30 @@ workout-logger/
 - `pnpm test` - Run tests
 - `pnpm type-check` - Run TypeScript type checking
 
-## CI/CD Pipeline
-
-This project includes a GitHub Actions CI/CD pipeline that:
-
-- ✅ Runs linter and type checks on every push
-- ✅ Runs tests before deployment
-- ✅ Automatically deploys to Vercel when pushing to `main` branch
-
-See [CI_CD_SETUP.md](./CI_CD_SETUP.md) for detailed setup instructions.
-
 ## Production Deployment
 
-### Automatic Deployment (Recommended)
+### Automatic Deployment with Vercel (Recommended)
 
-The project is configured for automatic deployment to Vercel via GitHub Actions. Simply:
+Vercel automatically handles testing, building, and deployment when you push to your GitHub repository:
 
-1. Push to the `main` branch
-2. The CI/CD pipeline will automatically:
-   - Run tests and checks
+1. Connect your GitHub repository to Vercel
+2. Push to the `main` branch
+3. Vercel will automatically:
+   - Run build checks
    - Build the application
-   - Deploy to Vercel production
-
-### Manual Deployment
+   - Deploy to production
 
 ### Environment Variables
 
-Make sure to set the following environment variables in your production environment:
+Make sure to set the following environment variables in your Vercel project settings:
 
 - `MONGODB_URI` - Your MongoDB connection string
 - `NEXTAUTH_SECRET` - A secure random string (use `generate-secret.js`)
-- `NEXTAUTH_URL` - Your production URL (e.g., `https://yourdomain.com`)
+- `NEXTAUTH_URL` - Your production URL (e.g., `https://your-app.vercel.app`)
 
-### Build for Production
+### Manual Deployment
+
+If you need to build and test locally:
 
 ```bash
 pnpm build
@@ -138,7 +129,7 @@ pnpm start
 
 ### Recommended Platforms
 
-- **Vercel** (Recommended for Next.js) - Configured with CI/CD
+- **Vercel** (Recommended for Next.js) - Automatic deployments from GitHub
 - **Netlify**
 - **Railway**
 - **Render**
