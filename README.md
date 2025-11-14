@@ -94,8 +94,32 @@ workout-logger/
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint
+- `pnpm test` - Run tests
+- `pnpm type-check` - Run TypeScript type checking
+
+## CI/CD Pipeline
+
+This project includes a GitHub Actions CI/CD pipeline that:
+
+- ✅ Runs linter and type checks on every push
+- ✅ Runs tests before deployment
+- ✅ Automatically deploys to Vercel when pushing to `main` branch
+
+See [CI_CD_SETUP.md](./CI_CD_SETUP.md) for detailed setup instructions.
 
 ## Production Deployment
+
+### Automatic Deployment (Recommended)
+
+The project is configured for automatic deployment to Vercel via GitHub Actions. Simply:
+
+1. Push to the `main` branch
+2. The CI/CD pipeline will automatically:
+   - Run tests and checks
+   - Build the application
+   - Deploy to Vercel production
+
+### Manual Deployment
 
 ### Environment Variables
 
@@ -114,7 +138,7 @@ pnpm start
 
 ### Recommended Platforms
 
-- **Vercel** (Recommended for Next.js)
+- **Vercel** (Recommended for Next.js) - Configured with CI/CD
 - **Netlify**
 - **Railway**
 - **Render**
