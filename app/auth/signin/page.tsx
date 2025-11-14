@@ -2,11 +2,11 @@
 
 import { signIn } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Dumbbell } from 'lucide-react';
 import Link from 'next/link';
 
-export default function SignInPage() {
+function SignInContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
@@ -114,5 +114,25 @@ export default function SignInPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function SignInPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-white flex items-center justify-center p-4">
+                <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 w-full max-w-md">
+                    <div className="text-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4 animate-pulse">
+                            <Dumbbell className="h-8 w-8 text-gray-400" />
+                        </div>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Linkly</h1>
+                        <p className="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        }>
+            <SignInContent />
+        </Suspense>
     );
 }

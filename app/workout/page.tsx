@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { WorkoutType, Exercise, WorkoutSession } from '@/types';
 import { WORKOUT_TYPES, getExerciseNamesByMuscleGroups } from '@/lib/workoutData';
@@ -17,7 +17,7 @@ interface GymPartner {
   avatar?: string | null;
 }
 
-export default function WorkoutPage() {
+function WorkoutContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { data: session } = useSession();
@@ -658,5 +658,22 @@ export default function WorkoutPage() {
             <Navigation currentPage={currentPage} onNavigate={handleNavigate} />
             <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
+    );
+}
+
+export default function WorkoutPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4 animate-pulse">
+                        <Dumbbell className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-600">Loading workout page...</p>
+                </div>
+            </div>
+        }>
+            <WorkoutContent />
+        </Suspense>
     );
 }
